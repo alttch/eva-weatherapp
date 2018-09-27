@@ -1,2 +1,5 @@
-# eva-weatherapp
-Weather App for EVA ICS v3
+Weather App for E.V.A. ICS. https://www.eva-ics.com/
+
+(uses https://github.com/alttch/weatherbroker)
+
+(c) 2012-2018 Altertech Group https://www.altertech.com/
