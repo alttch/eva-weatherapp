@@ -19,6 +19,7 @@ PHIS=`ls -1 phi`
 TPLS=`ls -1 tpl`
 VER=`grep ^__version__ phi/*|head -1|awk '{ print $3 }'|tr -d "['\"]"`
 DESCRIPTION=`grep ^__description__ phi/*|head -1| awk '{for(i=3;i<=NF;++i)print $i}' |tr -d "['\"]"|tr "\n" " "`
+ALLOW_ROOT=0
 
 function usage() {
 cat << EOF
@@ -149,11 +150,20 @@ do
             shift
             shift
             ;;
+        --root)
+            ALLOW_ROOT=1
+            shift
+        ;;
         *)
             option_error
             ;;
     esac
 done
+
+if [ "x$ALLOW_ROOT" != "x1" ] && [ "x`id -u`" != "x0" ]; then
+    echo "Please run this script as root"
+    exit 98
+fi
 
 [ "x${EVA_DIR}" == "x" ] && option_error
 [ -d ${EVA_DIR} ] || option_error
