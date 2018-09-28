@@ -76,6 +76,7 @@ import importlib
 
 from eva.uc.drivers.phi.generic_phi import PHI as GenericPHI
 from eva.uc.driverapi import log_traceback
+from eva.uc.driverapi import get_timeout
 
 
 class PHI(GenericPHI):
@@ -148,8 +149,7 @@ class PHI(GenericPHI):
         data = self.get_cached_state()
         if data is None:
             try:
-                if timeout: self.engine.timeout = timeout
-                data = self.engine.get_current()
+                data = self.engine.get_current(timeout=timeout)
                 if not data: return None
                 self.set_cached_state(data)
             except:
@@ -160,9 +160,9 @@ class PHI(GenericPHI):
 
     def test(self, cmd=None):
         if cmd == 'self':
-            return 'OK' if self.get() else 'FAILED'
+            return 'OK' if self.get(timeout=get_timeout()) else 'FAILED'
         if cmd == 'get':
-            return self.get()
+            return self.get(timeout=get_timeout())
         return {
             'get': 'get provider data',
         }
