@@ -1,0 +1,187 @@
+#!/bin/bash
+
+EVA_DIR=
+PROVIDER=
+API_KEY=
+GROUP=
+LAT=
+LON=
+CITY_ID=
+CITY=
+COUNTRY=
+CACHE=1200
+UPDATE=60
+LANGUAGE=
+UNITS=
+MODS_INSTALL=1
+MODS="weatherbroker"
+PHIS=`ls -1 phi`
+TPLS=`ls -1 tpl`
+VER=`grep ^__version__ phi/*|head -1|awk '{ print $3 }'|tr -d "['\"]"`
+DESCRIPTION=`grep ^__description__ phi/*|head -1| awk '{for(i=3;i<=NF;++i)print $i}' |tr -d "['\"]"|tr "\n" " "`
+
+function usage() {
+cat << EOF
+EVA ICS Data Collection App: ${DESCRIPTION}v${VER}
+
+Usage: setup <install|update|uninstall> [--skip-mods] <-d EVA_DIR>
+            [-p PROVIDER] [-k API_KEY] [-g SENSOR_GROUP] [--lat LAT]
+            [--lon LON] [--city-id CITY_ID] [--city CITY] [--country COUNTRY]
+            [--cache SEC] [--update SEC] [--lang LANGUAGE] [--units si|us]
+
+Installs (or uninstalls) app into EVA ICS ( https://www.eva-ics.com/ )
+Universal Controller.
+
+Note: If updating, Universal Controller is automatically restarted
+
+ Primary options:
+
+ --skip-mods              Skip installing/uninstalling required Python modules
+
+ -d EVA_DIR               EVA ICS directory
+ -p PROVIDER              Weather provider, required if installing/uninstalling
+                          (see https://github.com/alttch/weatherbroker)
+ -k API_KEY               Provider API key. required if installing
+ -g SENSOR_GROUP          Group to put sensors into (e.g. weather/weatherbit),
+                          required if installing/uninstalling
+
+ Location to get weather for (specify either lat/lon or city_id or
+ city/country, provider specific):
+
+ --lat LAT                 Latitude
+ --lon LON                 Longitude
+
+ --city-id CITY_ID         City ID
+
+ --city CITY               City
+ --country COUNTRY         Country
+
+ Additional options:
+
+ --cache SEC               Cache data for the specified time (sec),
+                           default: ${CACHE}
+ --update SEC              Update sensors with the specified interval
+                           default: ${UPDATE}
+ --lang LANGUAGE           Language code (provider specific)
+ --units si|us             Units ("si" for metric [default], "us" for imperial)
+
+EOF
+}
+
+function option_error {
+    usage
+    exit 2
+}
+
+CMD=$1
+shift
+
+while [[ $# -gt 0 ]]
+do
+    key="$1"
+    case $key in
+        --skip-mods)
+            MODS_INSTALL=0
+            shift
+            ;;
+        -d)
+            EVA_DIR=$2
+            shift
+            shift
+            ;;
+        -p)
+            PROVIDER=$2
+            shift
+            shift
+            ;;
+        -k)
+            API_KEY=$2
+            shift
+            shift
+            ;;
+        -g)
+            GROUP=$2
+            shift
+            shift
+            ;;
+        --lat)
+            LAT=$2
+            shift
+            shift
+            ;;
+        --lon)
+            LON=$2
+            shift
+            shift
+            ;;
+        --city-id)
+            CITY_ID=$2
+            shift
+            shift
+            ;;
+        --city)
+            CITY=$2
+            shift
+            shift
+            ;;
+        --country)
+            COUNTRY=$2
+            shift
+            shift
+            ;;
+        --cache)
+            CACHE=$2
+            shift
+            shift
+            ;;
+        --update)
+            UPDATE=$2
+            shift
+            shift
+            ;;
+        --lang)
+            LANGUAGE=$2
+            shift
+            shift
+            ;;
+        --units)
+            UNITS=$2
+            shift
+            shift
+            ;;
+        *)
+            option_error
+            ;;
+    esac
+done
+
+[ "x${EVA_DIR}" == "x" ] && option_error
+[ -d ${EVA_DIR} ] || option_error
+
+case $CMD in
+    install)
+        ;;
+    update)
+        for p in ${PHIS}; do
+            cp -vf phi/${p} ${EVA_DIR}/xc/drivers/phi/ || exit 1
+        done
+        for t in ${TPLS}; do
+            cp -vf tpl/${t} ${EVA_DIR}/runtime/tpl/ || exit 1
+        done
+        ;;
+    uninstall)
+        for p in ${PHIS}; do
+            rm -f ${EVA_DIR}/xc/drivers/phi/${p}
+        done
+        for t in ${TPLS}; do
+            rm -f ${EVA_DIR}/runtime/tpl/${TPLS}
+        done
+        for m in ${MODS}; do
+            pip3 uninstall $m
+        done
+        ;;
+    *)
+        option_error
+        ;;
+esac
+

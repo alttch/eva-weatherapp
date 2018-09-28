@@ -1,0 +1,194 @@
+{
+    "sensors": [
+        {
+            "group": "{{ GROUP }}",
+            "id": "clouds",
+            "props": {
+                "update_driver_config": {
+                    "port": "clouds"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "description",
+            "props": {
+                "update_driver_config": {
+                    "port": "description"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "dewp",
+            "props": {
+                "update_driver_config": {
+                    "port": "dewp"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "hum",
+            "props": {
+                "update_driver_config": {
+                    "port": "hum"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "icon",
+            "props": {
+                "update_driver_config": {
+                    "port": "icon"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "lat",
+            "props": {
+                "update_driver_config": {
+                    "port": "lat"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "lon",
+            "props": {
+                "update_driver_config": {
+                    "port": "lon"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "precip_int",
+            "props": {
+                "update_driver_config": {
+                    "port": "precip_int"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "precip_prob",
+            "props": {
+                "update_driver_config": {
+                    "port": "precip_prob"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "precip_type",
+            "props": {
+                "update_driver_config": {
+                    "port": "precip_type"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "pres",
+            "props": {
+                "update_driver_config": {
+                    "port": "pres"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "sunrise",
+            "props": {
+                "update_driver_config": {
+                    "port": "sunrise"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "sunset",
+            "props": {
+                "update_driver_config": {
+                    "port": "sunset"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "temp",
+            "props": {
+                "update_driver_config": {
+                    "port": "temp"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "time",
+            "props": {
+                "update_driver_config": {
+                    "port": "time"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "uv",
+            "props": {
+                "update_driver_config": {
+                    "port": "uv"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "vis",
+            "props": {
+                "update_driver_config": {
+                    "port": "vis"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "wind_deg",
+            "props": {
+                "update_driver_config": {
+                    "port": "wind_deg"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        },
+        {
+            "group": "{{ GROUP }}",
+            "id": "wind_spd",
+            "props": {
+                "update_driver_config": {
+                    "port": "wind_spd"
+                },
+                "update_exec": "|{{ PHI_ID }}.default"
+            }
+        }
+    ]
+}
