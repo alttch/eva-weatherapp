@@ -4,7 +4,7 @@ __license__ = "Apache-2.0"
 __version__ = "1.0.0"
 __description__ = "Weather Broker"
 
-__id__ = 'weatherbroker'
+__id__ = 'weatherapp'
 __equipment__ = 'cloud'
 __api__ = 1
 __required__ = ['port_get', 'value', 'aao_get']
@@ -96,6 +96,7 @@ class PHI(GenericPHI):
         self.__config_help = __config_help__
         self.__get_help = __get_help__
         self.__set_help = __set_help__
+        self.__help = __help__
         if info_only: return
         try:
             wb = importlib.import_module('weatherbroker')
@@ -134,7 +135,7 @@ class PHI(GenericPHI):
                 return
             self.engine.set_location(city_id=city_id)
         elif city and country:
-            self.engine_set_location(city=city, country=country)
+            self.engine.set_location(city=city, country=country)
         else:
             self.log_error('specify at least one location type')
             self.ready = False

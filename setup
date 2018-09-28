@@ -1,5 +1,11 @@
 #!/bin/bash
 
+ME="weatherapp"
+MODS="weatherbroker"
+
+PHIS=`ls -1 phi`
+TPLS=`ls -1 tpl`
+
 EVA_DIR=
 PROVIDER=
 API_KEY=
@@ -14,18 +20,15 @@ UPDATE=60
 LANGUAGE=
 UNITS=
 MODS_INSTALL=1
-MODS="weatherbroker"
-PHIS=`ls -1 phi`
-TPLS=`ls -1 tpl`
+SAVE=
 VER=`grep ^__version__ phi/*|head -1|awk '{ print $3 }'|tr -d "['\"]"`
-DESCRIPTION=`grep ^__description__ phi/*|head -1| awk '{for(i=3;i<=NF;++i)print $i}' |tr -d "['\"]"|tr "\n" " "`
 ALLOW_ROOT=0
 
 function usage() {
 cat << EOF
-EVA ICS Data Collection App: ${DESCRIPTION}v${VER}
+EVA ICS Data Collection App: ${ME}v${VER}
 
-Usage: setup <install|update|uninstall> [--skip-mods] <-d EVA_DIR>
+Usage: setup <install|update|uninstall> [--skip-mods] <-d EVA_DIR> [-y]
             [-p PROVIDER] [-k API_KEY] [-g SENSOR_GROUP] [--lat LAT]
             [--lon LON] [--city-id CITY_ID] [--city CITY] [--country COUNTRY]
             [--cache SEC] [--update SEC] [--lang LANGUAGE] [--units si|us]
@@ -38,8 +41,9 @@ Note: If updating, Universal Controller is automatically restarted
  Primary options:
 
  --skip-mods              Skip installing/uninstalling required Python modules
-
  -d EVA_DIR               EVA ICS directory
+ -y                       Save controller configuration after install
+
  -p PROVIDER              Weather provider, required if installing/uninstalling
                           (see https://github.com/alttch/weatherbroker)
  -k API_KEY               Provider API key. required if installing
@@ -70,8 +74,19 @@ EOF
 }
 
 function option_error {
+    ERR=$1
+    [ "x${ERR}" != "x" ] && echo $ERR
     usage
     exit 2
+}
+
+function copy_files {
+    for p in ${PHIS}; do
+        cp -vf phi/${p} ${EVA_DIR}/xc/drivers/phi/ || exit 1
+    done
+    for t in ${TPLS}; do
+        cp -vf tpl/${t} ${EVA_DIR}/runtime/tpl/ || exit 1
+    done
 }
 
 CMD=$1
@@ -88,6 +103,10 @@ do
         -d)
             EVA_DIR=$2
             shift
+            shift
+            ;;
+        -y)
+            SAVE=";save"
             shift
             ;;
         -p)
@@ -155,7 +174,7 @@ do
             shift
         ;;
         *)
-            option_error
+            option_error "Invalid option: $key"
             ;;
     esac
 done
@@ -165,33 +184,67 @@ if [ "x$ALLOW_ROOT" != "x1" ] && [ "x`id -u`" != "x0" ]; then
     exit 98
 fi
 
-[ "x${EVA_DIR}" == "x" ] && option_error
-[ -d ${EVA_DIR} ] || option_error
+[ "x${EVA_DIR}" == "x" ] && option_error "EVA_DIR not specified"
+[ -d ${EVA_DIR} ] || option_error "No such directory: ${EVA_DIR}"
+[ -f ${EVA_DIR}/etc/uc.ini ] || option_error "Invalid directory ${EVA_DIR} or UC not configured"
 
 case $CMD in
     install)
+        [ "x${PROVIDER}" == "x" ] && option_error "Provider not specified"
+        [ "x${API_KEY}" == "x" ] && option_error "API key not specified"
+        [ "x${GROUP}" == "x" ] && option_error "Sensor group not specified"
+        LOCATION=
+        if [ "x${LAT}" != "x" ] && [ "x${LON}" != "x" ]; then
+            LOCATION="lat=${LAT},lon=${LON}"
+        elif [ "x${CITY_ID}" != "x" ]; then
+            LOCATION="city_id=${CITY_ID}"
+        elif [ "x${CITY}" != "x" ] && [ "x${COUNTRY}" != "x" ]; then
+            LOCATION="city=${CITY},country=${COUNTRY}"
+        fi
+        [ "x${LOCATION}" == "x" ] && option_error "Location not specified"
+        if [ $MODS_INSTALL -eq 1 ]; then
+            for m in ${MODS}; do
+                pip3 install -U ${m} || exit 1
+            done
+        fi
+        copy_files
+        PHI_LOAD_STR="phi load ${ME}_${PROVIDER} ${ME} -c \"p=${PROVIDER}"
+        PHI_LOAD_STR="${PHI_LOAD_STR},${LOCATION},k=${API_KEY},cache=${CACHE},update=${UPDATE}"
+        [ "x$UNITS" != "x" ] && PHI_LOAD_STR="${PHI_LOAD_STR},units=${UNITS}"
+        [ "x$LANGUAGE" != "x" ] && PHI_LOAD_STR="${PHI_LOAD_STR},lang=${LANGUAGE}"
+        PHI_LOAD_STR="${PHI_LOAD_STR}\";phi test ${ME}_${PROVIDER} self"
+        DEVICE_STR="device create -c PHI_ID=${ME}_${PROVIDER},GROUP=${GROUP} ${ME}"
+        ( echo "test;${PHI_LOAD_STR};${DEVICE_STR}${SAVE}" | \
+            ${EVA_DIR}/bin/uc-cmd -R --exec-batch=stdin ) || exit 1
+        echo "Installation completed"
+        exit 0
         ;;
     update)
-        for p in ${PHIS}; do
-            cp -vf phi/${p} ${EVA_DIR}/xc/drivers/phi/ || exit 1
-        done
-        for t in ${TPLS}; do
-            cp -vf tpl/${t} ${EVA_DIR}/runtime/tpl/ || exit 1
-        done
+        copy_files
+        ${EVA_DIR}/sbin/uc-control restart || exit 1
+        echo "Update completed"
+        exit 0
         ;;
     uninstall)
+        [ "x${PROVIDER}" == "x" ] && option_error "Provider not specified"
+        [ "x${GROUP}" == "x" ] && option_error "Sensor group not specified"
+        PHI_UNLOAD_STR="phi unload ${ME}_${PROVIDER}"
+        DEVICE_STR="device destroy -c PHI_ID=${ME}_${PROVIDER},GROUP=${GROUP} ${ME}"
+        ( echo "test;${DEVICE_STR};${PHI_UNLOAD_STR}${SAVE}" | \
+            ${EVA_DIR}/bin/uc-cmd -R --exec-batch=stdin ) || exit 1
         for p in ${PHIS}; do
             rm -f ${EVA_DIR}/xc/drivers/phi/${p}
         done
         for t in ${TPLS}; do
             rm -f ${EVA_DIR}/runtime/tpl/${TPLS}
         done
-        for m in ${MODS}; do
-            pip3 uninstall $m
-        done
+        if [ $MODS_INSTALL -eq 1 ]; then
+            for m in ${MODS}; do
+                pip3 uninstall $m
+            done
+        fi
         ;;
     *)
         option_error
         ;;
 esac
-
