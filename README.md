@@ -1,4 +1,4 @@
-Weather App for E.V.A. ICS. https://www.eva-ics.com/
+Weather App for [EVA ICS](https://www.eva-ics.com/)
 
 (uses https://github.com/alttch/weatherbroker)
 
