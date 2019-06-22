@@ -1,7 +1,7 @@
 __author__ = "Altertech Group, https://www.altertech.com/"
 __copyright__ = "Copyright (C) 2012-2018 Altertech Group"
 __license__ = "Apache-2.0"
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 __description__ = "Weather Broker"
 
 __id__ = 'weatherapp'
@@ -130,6 +130,85 @@ class PHI(GenericPHI):
         self.engine.key = self.phi_cfg.get('k')
         self.engine.lang = self.phi_cfg.get('lang')
         self.engine.units = self.phi_cfg.get('units')
+
+    def get_ports(self):
+        return [{
+            'port': 'temp',
+            'name': 'Air temperature',
+            'description': ''
+        }, {
+            'port': 'hum',
+            'name': 'Air humidity',
+            'description': ''
+        }, {
+            'port': 'pres',
+            'name': 'Air pressure',
+            'description': ''
+        }, {
+            'port': 'clouds',
+            'name': 'Clouds',
+            'description': 'Cloud percentage'
+        }, {
+            'port': 'uv',
+            'name': 'UV index',
+            'description': ''
+        }, {
+            'port': 'vis',
+            'name': 'Visibility',
+            'description': 'Visibility in km/miles'
+        }, {
+            'port': 'wind_deg',
+            'name': 'Wind direction',
+            'description': 'Wind direction (degrees)'
+        }, {
+            'port': 'wind_spd',
+            'name': 'Wind speed',
+            'description': ''
+        }, {
+            'port': 'dewp',
+            'name': 'Dew Point',
+            'description': ''
+        }, {
+            'port': 'description',
+            'name': 'Weather description',
+            'description': 'Current weather description'
+        }, {
+            'port': 'icon',
+            'name': 'Weather icon code',
+            'description': ''
+        }, {
+            'port': 'precip_int',
+            'name': 'Precipitation intensity',
+            'description': ''
+        }, {
+            'port': 'precip_prob',
+            'name': 'Precipitation probability',
+            'description': ''
+        }, {
+            'port': 'precip_type',
+            'name': 'Precipitation type',
+            'description': ''
+        }, {
+            'port': 'sunrise',
+            'name': 'Sunrise time',
+            'description': ''
+        }, {
+            'port': 'sunset',
+            'name': 'Sunset time',
+            'description': ''
+        }, {
+            'port': 'lat',
+            'name': 'Location latitude',
+            'description': ''
+        }, {
+            'port': 'lon',
+            'name': 'Location longitude',
+            'description': ''
+        }, {
+            'port': 'time',
+            'name': 'Update timestamp',
+            'description': ''
+        }]
 
     def get(self, port=None, cfg=None, timeout=0):
         data = self.get_cached_state()
