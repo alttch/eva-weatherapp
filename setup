@@ -213,7 +213,7 @@ case $CMD in
         [ "x$UNITS" != "x" ] && PHI_LOAD_STR="${PHI_LOAD_STR},units=${UNITS}"
         [ "x$LANGUAGE" != "x" ] && PHI_LOAD_STR="${PHI_LOAD_STR},lang=${LANGUAGE}"
         PHI_TEST_STR="phi test ${ME}_${PROVIDER} self"
-        DEVICE_STR="device create -c PHI_ID=${ME}_${PROVIDER},GROUP=${GROUP} ${ME}"
+        DEVICE_STR="device deploy -c PHI_ID=${ME}_${PROVIDER},GROUP=${GROUP} ${ME}"
         ( echo "test;${PHI_LOAD_STR}\";${PHI_TEST_STR};${DEVICE_STR}${SAVE};${PHI_LOAD_STR},update=${UPDATE}\";save" | \
             ${EVA_DIR}/bin/uc-cmd -R --exec-batch=stdin ) || exit 1
         echo "Installation completed"
@@ -229,7 +229,7 @@ case $CMD in
         [ "x${PROVIDER}" == "x" ] && option_error "Provider not specified"
         [ "x${GROUP}" == "x" ] && option_error "Sensor group not specified"
         PHI_UNLOAD_STR="phi unload ${ME}_${PROVIDER}"
-        DEVICE_STR="device destroy -c PHI_ID=${ME}_${PROVIDER},GROUP=${GROUP} ${ME};save"
+        DEVICE_STR="device undeploy -c PHI_ID=${ME}_${PROVIDER},GROUP=${GROUP} ${ME};save"
         ( echo "test;${DEVICE_STR};${PHI_UNLOAD_STR}${SAVE}" | \
             ${EVA_DIR}/bin/uc-cmd -R --exec-batch=stdin ) || exit 1
         for p in ${PHIS}; do
