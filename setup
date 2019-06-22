@@ -204,7 +204,7 @@ case $CMD in
         [ "x${LOCATION}" == "x" ] && option_error "Location not specified"
         if [ $MODS_INSTALL -eq 1 ]; then
             for m in ${MODS}; do
-                ${EVA_DIR}/python/bin/pip3 install -U ${m} || exit 1
+                ${EVA_DIR}/python3/bin/pip3 install -U ${m} || exit 1
             done
         fi
         copy_files
@@ -240,7 +240,7 @@ case $CMD in
         done
         if [ $MODS_INSTALL -eq 1 ]; then
             for m in ${MODS}; do
-                ${EVA_DIR}/python/bin/pip3 uninstall $m
+                ${EVA_DIR}/python3/bin/pip3 uninstall $m
             done
         fi
         ;;
